@@ -21,7 +21,8 @@ import sys, json, copy
 import openpyxl
 from openpyxl.styles import PatternFill, Font, Alignment
 
-# (Excel header, json key) in final order. First 28 == original template columns.
+# (Excel header, json key) in final order. Domain-agnostic schema (35 columns):
+# works for any ML / neural-network / AI prediction paper, in any field.
 COLUMNS = [
     ("PDF name", "pdf_name"),
     ("Paper title", "paper_title"),
@@ -29,18 +30,18 @@ COLUMNS = [
     ("Year", "year"),
     ("Publisher / venue", "publisher_venue"),
     ("DOI / link", "doi_link"),
-    ("Target task", "target_task"),
+    ("Application domain", "application_domain"),
+    ("Prediction target / task", "target_task"),
     ("Target definition", "target_definition"),
-    ("Battery chemistry", "battery_chemistry"),
-    ("Cell / module / pack level", "cell_module_pack_level"),
+    ("Data modality", "data_modality"),
     ("Dataset", "dataset"),
     ("Public dataset?", "public_dataset"),
-    ("Experimental conditions", "experimental_conditions"),
-    ("Input data type", "input_data_type"),
+    ("Experimental setup", "experimental_conditions"),
+    ("Input variables (raw)", "input_data_type"),
     ("Data preparation", "data_preparation"),
     ("Feature extraction", "feature_extraction"),
     ("Model category", "model_category"),
-    ("NN architecture", "nn_architecture"),
+    ("Model / NN architecture", "nn_architecture"),
     ("Training strategy", "training_strategy"),
     ("Validation strategy", "validation_strategy"),
     ("Baseline models", "baseline_models"),
@@ -52,7 +53,7 @@ COLUMNS = [
     ("Limitations", "limitations"),
     ("Relevance to my review", "relevance"),
     ("Notes", "notes"),
-    # --- new analytical columns ---
+    # --- analytical columns ---
     ("Architecture (plain-language)", "architecture_plain"),
     ("Input representation", "input_representation"),
     ("Results (structured)", "results_structured"),
@@ -128,10 +129,12 @@ def main():
     from openpyxl.utils import get_column_letter
     widths_by_title = {
         "PDF name": 34, "Paper title": 40, "Authors": 34, "Year": 8,
-        "Publisher / venue": 24, "DOI / link": 30, "Feature extraction": 40,
-        "Architecture (plain-language)": 50, "Results (structured)": 36,
-        "Results source + page": 30, "Extraction confidence": 16,
-        "Fields to verify (manual)": 30,
+        "Publisher / venue": 24, "DOI / link": 30, "Application domain": 26,
+        "Prediction target / task": 24, "Data modality": 24,
+        "Experimental setup": 30, "Input variables (raw)": 28,
+        "Feature extraction": 40, "Architecture (plain-language)": 50,
+        "Results (structured)": 36, "Results source + page": 30,
+        "Extraction confidence": 16, "Fields to verify (manual)": 30,
     }
     for idx, (title, _) in enumerate(COLUMNS, start=1):
         ws.column_dimensions[get_column_letter(idx)].width = widths_by_title.get(title, 26)

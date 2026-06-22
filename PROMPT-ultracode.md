@@ -1,47 +1,45 @@
-# PROMPT FINALE — run ultracode su tutti i 117 PDF (1 agente per file)
+# PROMPT — run the review over all your PDFs (ultracode, 1 agent per file)
 
-> Incolla TUTTO il blocco qui sotto nella sessione Claude Code già aperta
-> (lanciata con skip-permission). La parola `ultracode` abilita il workflow
-> multi-agente. Tempo atteso ~45-75 min. Output finale anche in ~/Downloads.
+> Paste the block below into a Claude Code session started with skip-permission.
+> The word `ultracode` enables the multi-agent workflow. One agent per PDF.
+> Replace `<PROJECT>` with your project directory.
 
 ---
 
 ultracode.
 
-Sei in un task di **literature review pubblicabile** su paper di Machine Learning per batterie al litio (RUL — Remaining Useful Life, e SOH — State of Health). L'output è destinato a pubblicazione: un errore può avere conseguenze legali, quindi la regola assoluta è **non inventare mai un dato** (assente = "Not reported"; numero non tracciabile a tabella/figura/pagina = non è un fatto).
+You are doing a **publication-grade literature review** of research papers that
+apply Machine Learning / neural networks / AI to predict an output (ANY field).
+The output is meant for publication: the absolute rule is **never invent a value**
+(absent = "Not reported"; a number not traceable to a specific table/figure/page
+is not a fact).
 
-Usa la skill **battery-lit-review-extractor** (in ~/.claude/skills/): leggi il suo SKILL.md e i file in references/ e segui ESATTAMENTE quel pattern (estrattore + verificatore avversariale, 1 agente per PDF, lettura VISION delle figure dei risultati). Non improvvisare uno schema tuo: usa le 35 colonne e le regole della skill.
+Use the skill **ml-litreview-extractor** (in ~/.claude/skills/): read its SKILL.md
+and the files in references/ and follow that pattern EXACTLY (extractor +
+adversarial verifier, 1 agent per PDF, VISION reading of the result figures). Use
+its 35 columns, not a schema of your own.
 
-Progetto: /Users/francescozattoni/Sviluppo/battery-lit-review
-- pdfs/ → 117 PDF da analizzare (già scompattati; se vuota, scompatta da ~/Downloads/wetransfer_ml_main-zip_2026-06-19_0919/ML_main.zip e ML_backup.zip)
-- model_template.xlsx → modello colonne (NON modificarlo)
-- output/ → qui va l'Excel finale
+Project: <PROJECT>
+- pdfs/ → the PDFs to analyse (put your legally-obtained PDFs here)
+- model_template.xlsx → optional column template (do NOT modify it)
+- output/ → the final Excel goes here
 
-Esegui i 3 stadi della skill (gli script sono in ~/.claude/skills/battery-lit-review-extractor/scripts/):
+Run the 3 stages of the skill (scripts in ~/.claude/skills/ml-litreview-extractor/scripts/):
 
-1) PRE-PROCESSING (deterministico):
-   cd /Users/francescozattoni/Sviluppo/battery-lit-review
-   python3 ~/.claude/skills/battery-lit-review-extractor/scripts/preprocess.py pdfs work --max-render 6 --dpi-zoom 2.0
+1) PRE-PROCESSING (deterministic):
+   cd <PROJECT>
+   python3 ~/.claude/skills/ml-litreview-extractor/scripts/preprocess.py pdfs work --max-render 6 --dpi-zoom 2.0
    python3 -c "import json; ids=[d['pdf_id'] for d in json.load(open('work/_index.json')) if 'pdf_id' in d]; json.dump(ids, open('work/_ids.json','w')); print(len(ids),'bundles')"
 
-2) ESTRAZIONE + VERIFICA (workflow, 1 agente per PDF). Leggi gli id da work/_ids.json e invoca il workflow bundlato:
-   Workflow({ scriptPath: "/Users/francescozattoni/.claude/skills/battery-lit-review-extractor/scripts/extract_workflow.js",
-              args: { workRoot: "/Users/francescozattoni/Sviluppo/battery-lit-review/work", ids: <array da work/_ids.json> } })
-   Quando il workflow termina: il risultato in contesto è TRONCATO. Leggi il file output del task indicato dalla notifica di completamento (/private/tmp/.../tasks/<task-id>.output), fai json.load, prendi ["result"] (cioè {count, rows}) e salvalo in output/verified_rows.json.
+2) EXTRACT + VERIFY (workflow, 1 agent per PDF). Read the ids from work/_ids.json and invoke the bundled workflow:
+   Workflow({ scriptPath: "/Users/<you>/.claude/skills/ml-litreview-extractor/scripts/extract_workflow.js",
+              args: { workRoot: "<PROJECT>/work", ids: <array from work/_ids.json> } })
+   When the workflow finishes, the result in context is TRUNCATED. Read the task output file from the completion notification (/private/tmp/.../tasks/<task-id>.output), json.load it, take ["result"] ({count, rows}), and save it to output/verified_rows.json.
 
-3) SCRITTURA EXCEL (deterministico):
-   python3 ~/.claude/skills/battery-lit-review-extractor/scripts/write_excel.py output/verified_rows.json model_template.xlsx output/battery_ml_review_FILLED.xlsx
-   cp output/battery_ml_review_FILLED.xlsx ~/Downloads/battery_ml_review_FILLED.xlsx
+3) WRITE EXCEL (deterministic):
+   python3 ~/.claude/skills/ml-litreview-extractor/scripts/write_excel.py output/verified_rows.json model_template.xlsx output/review_FILLED.xlsx
+   cp output/review_FILLED.xlsx ~/Downloads/review_FILLED.xlsx
 
-VERIFICA FINALE (obbligatoria, riportami i numeri):
-   python3 - <<'PY'
-   import openpyxl, json
-   ws = openpyxl.load_workbook("output/battery_ml_review_FILLED.xlsx")["Review_Matrix"]
-   ids = json.load(open("work/_ids.json"))
-   print("Righe dati:", ws.max_row-1, "| Colonne:", ws.max_column, "| PDF attesi:", len(ids), "| match righe:", ws.max_row-1==len(ids))
-   PY
-Atteso: righe == 117, colonne == 35.
+FINAL CHECK (report the numbers): rows == number of PDFs, columns == 35, how many yellow cells (to verify by hand), and the path of the Excel files.
 
-VINCOLI (non derogabili): mai inventare (Not reported); leggere le immagini delle pagine-risultati per le metriche; raw signals e feature engineered separati; ogni feature engineered con formula o descrizione; Publisher = solo rivista + editore; Authors = lista completa; lingua celle in inglese; celle incerte in giallo + colonna "Fields to verify". NON modificare model_template.xlsx né i PDF. Nessun git, nessun push, nessuna credenziale. I PDF sono paper pubblici: nessun dato personale.
-
-Quando hai finito, dimmi: righe/colonne della verifica finale, quante celle gialle (da verificare a mano), e il path dei due file Excel (output/ e ~/Downloads/).
+CONSTRAINTS (non-negotiable): never invent (Not reported); read the result-page images for metrics; keep raw inputs vs engineered features separate; each engineered feature with formula or description; Publisher = venue + publisher only; full Authors; cells in English. Do NOT modify the template or the PDFs. No git/push/credentials. Papers are copyrighted: process locally, never redistribute.
