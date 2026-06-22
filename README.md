@@ -10,6 +10,11 @@ medicine, finance, materials, NLP, computer vision, engineering, climate,
 genomics. Any paper that trains a model to predict something fits; the field is
 captured in an `Application domain` column instead of being hard-coded.
 
+**The goal:** let any researcher, with zero setup, grasp a whole body of
+literature and spot the field's trends at a glance — once the papers are in one
+comparable matrix, patterns (which architectures, datasets, metrics and results
+dominate) jump out.
+
 ## Why this exists (the edge over commercial tools)
 
 Commercial review assistants (Elicit, SciSpace, Scholarcy…) work off open-access
