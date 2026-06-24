@@ -1,31 +1,15 @@
 # ml-litreview-extractor
 
-A Claude Code skill + multi-agent workflow that turns a folder of **research
-papers using Machine Learning / neural networks / AI to predict an output** into
-a clean, **publication-grade literature-review matrix** in Excel: one row per
-PDF, 35 columns, every value traceable, nothing invented.
+A Claude Code skill and multi-agent workflow for analysing and classifying research papers to support structured literature reviews. The workflow was developed and validated on a corpus of 100+ papers focused on neural-network-based estimation of lithium battery state of health (SOH), state of charge (SOC), and remaining useful life (RUL). It generates a spreadsheet that maps each paper against 35 machine-learning and application-oriented features, enabling faster comparison, synthesis, and gap identification.
 
-**Domain-agnostic.** It does not care about the field — energy, batteries,
-medicine, finance, materials, NLP, computer vision, engineering, climate,
-genomics. Any paper that trains a model to predict something fits; the field is
-captured in an `Application domain` column instead of being hard-coded.
 
-**The goal:** let any researcher, with zero setup, grasp a whole body of
-literature and spot the field's trends at a glance — once the papers are in one
-comparable matrix, patterns (which architectures, datasets, metrics and results
-dominate) jump out.
+## Key strenghts
 
-## Why this exists (the edge over commercial tools)
+- **Benchmarking:** glance comparison of networks architectures, data preparations and performance metrics 
+- **Domain-agnostic:** scalable to different applied machine learning domains
+- **Paywall:** running on local PDFs can bring to another level of detail your Zootero libraries and avoid basing literature reviews on only open access papers 
 
-Commercial review assistants (Elicit, SciSpace, Scholarcy…) work off open-access
-metadata and **cannot read papers behind a paywall**. But researchers usually
-**already have the PDFs** they need, downloaded through their institution from
-IEEE Xplore, ScienceDirect/Elsevier, SpringerLink, Taylor & Francis, Wiley, ACM.
 
-This tool runs **on those local PDFs**, so it covers exactly the literature a real
-review depends on — and it goes deeper: it reads the **figures and result tables
-as images**, where the metrics are often trapped. Zero effort to adapt to a new
-field: point it at your PDFs and run.
 
 ## How it works
 
@@ -41,9 +25,7 @@ PDFs ─▶ [1] preprocess.py  ─▶ work/<id>/{text.txt, tables.txt, page_*.pn
 
 Designed for **publication-grade accuracy**:
 
-- **Never invent.** If a value is not explicitly in the paper, the cell reads
-  `Not reported`. A number that cannot be traced to a specific table/figure/page
-  is not recorded as fact.
+
 - **One agent per PDF + a second adversarial pass.** Isolation avoids
   cross-contamination between papers; the verifier *tries to refute* every
   critical field, catching plausible-but-wrong values a single read lets through.
@@ -97,6 +79,3 @@ papers are copyrighted by their publishers (IEEE, Elsevier, Springer, Taylor &
 Francis, Wiley, ACM, AIP…) and must not be redistributed. Bring your own
 legally-obtained PDFs; processing happens locally on your machine.
 
-## License
-
-MIT — see [LICENSE](LICENSE).
